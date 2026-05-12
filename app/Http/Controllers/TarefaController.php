@@ -13,38 +13,37 @@ class TarefaController extends Controller
 {
     // ─── LISTA DE TAREFAS ───────────────────────────
     public function index(Request $request)
-    {
-        $query = auth()->user()->tarefas()->latest();
+{
+    $query = auth()->user()->tarefas()->latest();
 
-        // Filtro por status
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // Filtro por prioridade
-        if ($request->filled('prioridade')) {
-            $query->where('prioridade', $request->prioridade);
-        }
-
-        // Pesquisa por título
-        if ($request->filled('pesquisa')) {
-            $query->where('titulo', 'like', '%' . $request->pesquisa . '%');
-        }
-
-        $tarefas = $query->paginate(10);
-
-        // Estatísticas para o dashboard
-        $estatisticas = [
-            'total'     => auth()->user()->tarefas()->count(),
-            'pendente'  => auth()->user()->tarefas()->pendente()->count(),
-            'progresso' => auth()->user()->tarefas()->progresso()->count(),
-            'concluida' => auth()->user()->tarefas()->concluida()->count(),
-            'atrasada'  => auth()->user()->tarefas()->atrasada()->count(),
-        ];
-
-        return view('tarefas.index', compact('tarefas', 'estatisticas'));
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
     }
 
+    if ($request->filled('prioridade')) {
+        $query->where('prioridade', $request->prioridade);
+    }
+
+    if ($request->filled('pesquisa')) {
+        $query->where('titulo', 'like', '%' . $request->pesquisa . '%');
+    }
+
+    $tarefas = $query->paginate(10);
+
+    $estatisticas = [
+        'total'     => auth()->user()->tarefas()->count(),
+        'pendente'  => auth()->user()->tarefas()->pendente()->count(),
+        'progresso' => auth()->user()->tarefas()->progresso()->count(),
+        'concluida' => auth()->user()->tarefas()->concluida()->count(),
+        'atrasada'  => auth()->user()->tarefas()->atrasada()->count(),
+    ];
+
+    // ← estas duas linhas estavam em falta
+    $status     = Status::cases();
+    $prioridade = Prioridade::cases();
+
+    return view('tarefas.index', compact('tarefas', 'estatisticas', 'status', 'prioridade'));
+}
     // ─── FORMULÁRIO CRIAR ───────────────────────────
     public function create()
     {

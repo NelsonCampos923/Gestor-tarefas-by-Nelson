@@ -1,60 +1,124 @@
-<x-guest-layout>
-    <x-authentication-card>
-        <x-slot name="logo">
-            <x-authentication-card-logo />
-        </x-slot>
+@extends('layouts.guest')
 
-        <x-validation-errors class="mb-4" />
+@section('titulo', 'Criar Conta')
 
-        <form method="POST" action="{{ route('register') }}">
-            @csrf
+@section('conteudo')
 
-            <div>
-                <x-label for="name" value="{{ __('Name') }}" />
-                <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+    <h1 class="auth-card-titulo">Criar conta</h1>
+    <p class="auth-card-sub">Regista-te gratuitamente e começa a organizar.</p>
+
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-3 py-2 px-3">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            @foreach($errors->all() as $erro)
+                <span class="small d-block">{{ $erro }}</span>
+            @endforeach
+            <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('register') }}">
+        @csrf
+
+        {{-- Nome --}}
+        <div class="mb-3">
+            <label class="form-label">Nome completo</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 border" style="border-radius:0.5rem 0 0 0.5rem;border-color:#e2e8f0;">
+                    <i class="fas fa-user text-muted" style="font-size:0.8rem;"></i>
+                </span>
+                <input type="text" name="name"
+                       class="form-control border-start-0 @error('name') is-invalid @enderror"
+                       style="border-radius:0 0.5rem 0.5rem 0;"
+                       placeholder="O teu nome"
+                       value="{{ old('name') }}" required autofocus>
+                @error('name')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
+        </div>
 
-            <div class="mt-4">
-                <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
+        {{-- Email --}}
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 border" style="border-radius:0.5rem 0 0 0.5rem;border-color:#e2e8f0;">
+                    <i class="fas fa-envelope text-muted" style="font-size:0.8rem;"></i>
+                </span>
+                <input type="email" name="email"
+                       class="form-control border-start-0 @error('email') is-invalid @enderror"
+                       style="border-radius:0 0.5rem 0.5rem 0;"
+                       placeholder="o-teu@email.com"
+                       value="{{ old('email') }}" required>
+                @error('email')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
+        </div>
 
-            <div class="mt-4">
-                <x-label for="password" value="{{ __('Password') }}" />
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
+        {{-- Password --}}
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 border" style="border-radius:0.5rem 0 0 0.5rem;border-color:#e2e8f0;">
+                    <i class="fas fa-lock text-muted" style="font-size:0.8rem;"></i>
+                </span>
+                <input type="password" name="password" id="inputPassword"
+                       class="form-control border-start-0 border-end-0 @error('password') is-invalid @enderror"
+                       placeholder="Mínimo 8 caracteres" required>
+                <button type="button" class="btn btn-outline-secondary"
+                        onclick="togglePassword('inputPassword', this)">
+                    <i class="fas fa-eye" style="font-size:0.8rem;"></i>
+                </button>
+                @error('password')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
+        </div>
 
-            <div class="mt-4">
-                <x-label for="password_confirmation" value="{{ __('Confirm Password') }}" />
-                <x-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
+        {{-- Confirmar Password --}}
+        <div class="mb-4">
+            <label class="form-label">Confirmar Password</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 border" style="border-radius:0.5rem 0 0 0.5rem;border-color:#e2e8f0;">
+                    <i class="fas fa-lock text-muted" style="font-size:0.8rem;"></i>
+                </span>
+                <input type="password" name="password_confirmation" id="inputConfirm"
+                       class="form-control border-start-0 border-end-0"
+                       placeholder="Repete a password" required>
+                <button type="button" class="btn btn-outline-secondary"
+                        onclick="togglePassword('inputConfirm', this)">
+                    <i class="fas fa-eye" style="font-size:0.8rem;"></i>
+                </button>
             </div>
+        </div>
 
-            @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
-                <div class="mt-4">
-                    <x-label for="terms">
-                        <div class="flex items-center">
-                            <x-checkbox name="terms" id="terms" required />
+        <button type="submit" class="btn btn-auth">
+            <i class="fas fa-user-plus me-2"></i> Criar Conta
+        </button>
 
-                            <div class="ms-2">
-                                {!! __('I agree to the :terms_of_service and :privacy_policy', [
-                                        'terms_of_service' => '<a target="_blank" href="'.route('terms.show').'" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">'.__('Terms of Service').'</a>',
-                                        'privacy_policy' => '<a target="_blank" href="'.route('policy.show').'" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">'.__('Privacy Policy').'</a>',
-                                ]) !!}
-                            </div>
-                        </div>
-                    </x-label>
-                </div>
-            @endif
+        <div class="divider">ou</div>
 
-            <div class="flex items-center justify-end mt-4">
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                    {{ __('Already registered?') }}
-                </a>
+        <p class="text-center text-muted small mb-0">
+            Já tens conta?
+            <a href="{{ route('login') }}" class="auth-link">Entrar</a>
+        </p>
+    </form>
 
-                <x-button class="ms-4">
-                    {{ __('Register') }}
-                </x-button>
-            </div>
-        </form>
-    </x-authentication-card>
-</x-guest-layout>
+@endsection
+
+@push('scripts')
+<script>
+    function togglePassword(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon  = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+</script>
+@endpush

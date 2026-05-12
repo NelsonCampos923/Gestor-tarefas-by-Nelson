@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TarefaController;
+use Laravel\Jetstream\Jetstream;
+
 
 // Página inicial → redireciona para login
 Route::get('/', fn() => redirect()->route('login'));
@@ -25,4 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // CRUD principal
     Route::resource('tarefas', TarefaController::class);
+
+    Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil.show');
+    Route::delete('/perfil', [PerfilController::class, 'destroy'])->name('perfil.eliminar');
 });

@@ -1,36 +1,96 @@
-<x-guest-layout>
-    <x-authentication-card>
-        <x-slot name="logo">
-            <x-authentication-card-logo />
-        </x-slot>
+@extends('layouts.guest')
 
-        <x-validation-errors class="mb-4" />
+@section('titulo', 'Redefinir Password')
 
-        <form method="POST" action="{{ route('password.update') }}">
-            @csrf
+@section('conteudo')
 
-            <input type="hidden" name="token" value="{{ $request->route('token') }}">
+    <h1 class="auth-card-titulo">Nova password</h1>
+    <p class="auth-card-sub">Define a tua nova password abaixo.</p>
 
-            <div class="block">
-                <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-3 py-2 px-3">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            @foreach($errors->all() as $erro)
+                <span class="small d-block">{{ $erro }}</span>
+            @endforeach
+            <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('password.update') }}">
+        @csrf
+        <input type="hidden" name="token" value="{{ $request->route('token') }}">
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 border" style="border-radius:0.5rem 0 0 0.5rem;border-color:#e2e8f0;">
+                    <i class="fas fa-envelope text-muted" style="font-size:0.8rem;"></i>
+                </span>
+                <input type="email" name="email"
+                       class="form-control border-start-0 @error('email') is-invalid @enderror"
+                       style="border-radius:0 0.5rem 0.5rem 0;"
+                       value="{{ old('email', $request->email) }}" required>
+                @error('email')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
+        </div>
 
-            <div class="mt-4">
-                <x-label for="password" value="{{ __('Password') }}" />
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
+        <div class="mb-3">
+            <label class="form-label">Nova Password</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 border" style="border-radius:0.5rem 0 0 0.5rem;border-color:#e2e8f0;">
+                    <i class="fas fa-lock text-muted" style="font-size:0.8rem;"></i>
+                </span>
+                <input type="password" name="password" id="inputPassword"
+                       class="form-control border-start-0 border-end-0 @error('password') is-invalid @enderror"
+                       placeholder="Mínimo 8 caracteres" required>
+                <button type="button" class="btn btn-outline-secondary"
+                        onclick="togglePassword('inputPassword', this)">
+                    <i class="fas fa-eye" style="font-size:0.8rem;"></i>
+                </button>
+                @error('password')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
+        </div>
 
-            <div class="mt-4">
-                <x-label for="password_confirmation" value="{{ __('Confirm Password') }}" />
-                <x-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
+        <div class="mb-4">
+            <label class="form-label">Confirmar Nova Password</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 border" style="border-radius:0.5rem 0 0 0.5rem;border-color:#e2e8f0;">
+                    <i class="fas fa-lock text-muted" style="font-size:0.8rem;"></i>
+                </span>
+                <input type="password" name="password_confirmation" id="inputConfirm"
+                       class="form-control border-start-0 border-end-0"
+                       placeholder="Repete a nova password" required>
+                <button type="button" class="btn btn-outline-secondary"
+                        onclick="togglePassword('inputConfirm', this)">
+                    <i class="fas fa-eye" style="font-size:0.8rem;"></i>
+                </button>
             </div>
+        </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <x-button>
-                    {{ __('Reset Password') }}
-                </x-button>
-            </div>
-        </form>
-    </x-authentication-card>
-</x-guest-layout>
+        <button type="submit" class="btn btn-auth">
+            <i class="fas fa-key me-2"></i> Redefinir Password
+        </button>
+    </form>
+
+@endsection
+
+@push('scripts')
+<script>
+    function togglePassword(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon  = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+</script>
+@endpush
