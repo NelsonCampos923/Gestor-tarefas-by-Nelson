@@ -118,6 +118,21 @@
             font-size: 0.875rem;
         }
 
+        /* Link admin — destaque subtil */
+        .sidebar-link.admin-link {
+            color: #fbbf24;
+        }
+
+        .sidebar-link.admin-link:hover {
+            background: rgba(251,191,36,0.12);
+            color: #fbbf24;
+        }
+
+        .sidebar-link.admin-link.active {
+            background: #d97706;
+            color: #fff;
+        }
+
         .sidebar-footer {
             padding: 1rem 0.75rem;
             border-top: 1px solid rgba(255,255,255,0.08);
@@ -156,6 +171,23 @@
         .user-email {
             font-size: 0.7rem;
             color: rgba(255,255,255,0.4);
+        }
+
+        /* Badge role na sidebar */
+        .role-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: auto;
+        }
+
+        .role-badge.admin {
+            background: rgba(251,191,36,0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251,191,36,0.3);
         }
 
         /* ── CONTEÚDO PRINCIPAL ──────────────────── */
@@ -383,9 +415,22 @@
 
             <div class="sidebar-label mt-2">Conta</div>
 
-            <a href="{{ route('profile.show') }}" class="sidebar-link">
+            <a href="{{ route('profile.show') }}"
+               class="sidebar-link {{ request()->routeIs('profile.show') ? 'active' : '' }}">
                 <i class="fas fa-user-circle"></i> Perfil
             </a>
+
+            {{-- Link Admin — visível apenas para administradores --}}
+            @if(auth()->check() && auth()->user()->isAdmin())
+                <div class="sidebar-label mt-2">Administração</div>
+
+                <a href="{{ route('admin.index') }}"
+                   class="sidebar-link admin-link {{ request()->routeIs('admin.*') ? 'active' : '' }}">
+                    <i class="fas fa-shield-alt"></i>
+                    Painel Admin
+                    <span class="role-badge admin">Admin</span>
+                </a>
+            @endif
         </nav>
 
         {{-- Footer do utilizador --}}
@@ -420,6 +465,13 @@
                 <span class="topbar-titulo">@yield('titulo', 'Dashboard')</span>
             </div>
             <div class="d-flex align-items-center gap-2">
+                {{-- Badge admin na topbar --}}
+                @if(auth()->check() && auth()->user()->isAdmin())
+                    <span class="badge"
+                          style="background:rgba(217,119,6,0.12);color:#d97706;border:1px solid rgba(217,119,6,0.25);font-size:0.65rem;">
+                        <i class="fas fa-shield-alt me-1"></i> Admin
+                    </span>
+                @endif
                 @yield('topbar-acoes')
             </div>
         </header>

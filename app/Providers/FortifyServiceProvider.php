@@ -35,6 +35,20 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::redirectUserForTwoFactorAuthenticationUsing(RedirectIfTwoFactorAuthenticatable::class);
 
+        // ── Redirect após LOGIN conforme o role ──────────────────
+        Fortify::redirects('login', function () {
+            return auth()->user()->isAdmin()
+                ? route('admin.index')
+                : route('tarefas.index');
+        });
+
+        // ── Redirect após REGISTO conforme o role ────────────────
+        Fortify::redirects('register', function () {
+            return auth()->user()->isAdmin()
+                ? route('admin.index')
+                : route('tarefas.index');
+        });
+
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
